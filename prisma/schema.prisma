@@ -1,0 +1,80 @@
+// Prisma schema for Next.js Clean Architecture Starter Kit
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// User Management
+// ===========================================
+
+model users {
+  id            String   @id @default(uuid()) @db.Uuid
+  email         String   @unique @db.VarChar(255)
+  password_hash String   @db.VarChar(255)
+  full_name     String?  @db.VarChar(255)
+  role          Role     @default(user)
+  permissions   String[] @default([])
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  api_keys       api_keys[]
+  refresh_tokens refresh_tokens[]
+
+  @@index([email])
+  @@index([role])
+  @@index([is_active])
+}
+
+enum Role {
+  admin
+  user
+}
+
+// ===========================================
+// API Keys for programmatic access
+// ===========================================
+
+model api_keys {
+  id           String    @id @default(uuid()) @db.Uuid
+  user_id      String    @db.Uuid
+  name         String    @db.VarChar(100)
+  key_prefix   String    @db.VarChar(10)
+  key_hash     String    @db.VarChar(255)
+  scopes       String[]  @default([])
+  is_active    Boolean   @default(true)
+  last_used_at DateTime?
+  expires_at   DateTime?
+  created_at   DateTime  @default(now())
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([key_prefix])
+  @@index([user_id])
+  @@index([is_active])
+}
+
+// ===========================================
+// Refresh Tokens for session management
+// ===========================================
+
+model refresh_tokens {
+  id         String    @id @default(uuid()) @db.Uuid
+  user_id    String    @db.Uuid
+  token_hash String    @db.VarChar(255)
+  expires_at DateTime
+  created_at DateTime  @default(now())
+  revoked_at DateTime?
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([token_hash])
+  @@index([user_id])
+  @@index([expires_at])
+}

@@ -1,0 +1,28 @@
+# ===========================================
+# Development Dockerfile with hot reload
+# ===========================================
+
+FROM oven/bun:1.1.42-alpine
+
+WORKDIR /app
+
+# Install dependencies for Prisma
+RUN apk add --no-cache openssl
+
+# Copy package files
+COPY package.json bun.lockb* ./
+
+# Install dependencies
+RUN bun install
+
+# Copy Prisma schema for client generation
+COPY prisma ./prisma/
+RUN bun run prisma:generate
+
+# Copy application source
+COPY . .
+
+EXPOSE 3000
+
+# Run development server with hot reload
+CMD ["bun", "run", "dev"]
