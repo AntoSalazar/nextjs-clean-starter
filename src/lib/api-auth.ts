@@ -21,14 +21,21 @@ export interface AuthenticatedUser {
 
 export async function getAuthenticatedUser(request: Request): Promise<AuthenticatedUser | null> {
   const authHeader = request.headers.get('Authorization');
+  let token: string | undefined;
 
-  if (!authHeader) {
-    return null;
+  // 1. Check Authorization header
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
   }
 
-  const [type, token] = authHeader.split(' ');
+  // 2. Check cookies if no header token
+  if (!token) {
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    token = cookieStore.get('access_token')?.value;
+  }
 
-  if (type !== 'Bearer' || !token) {
+  if (!token) {
     return null;
   }
 
