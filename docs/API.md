@@ -1,5 +1,9 @@
 # API Reference
 
+> **Interactive Documentation**: Access the full interactive API documentation at [http://localhost:3000/docs](http://localhost:3000/docs).
+
+This document provides a manual reference for the API endpoints. For the most up-to-date and interactive experience, please use the link above.
+
 ## Authentication
 
 All API endpoints (except public ones) require authentication via either:

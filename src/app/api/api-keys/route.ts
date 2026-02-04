@@ -15,6 +15,54 @@ const CreateApiKeySchema = z.object({
   expiresInDays: z.number().min(1).max(365).optional(),
 });
 
+/**
+ * @swagger
+ * /api/api-keys:
+ *   get:
+ *     summary: List API keys
+ *     description: Retrieve all API keys for the authenticated user.
+ *     tags:
+ *       - API Keys
+ *     security:
+ *       - BearerAuth: []
+ *       - ApiKeyAuth: []
+ *     responses:
+ *       200:
+ *         description: List of API keys
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 apiKeys:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       name:
+ *                         type: string
+ *                       keyPrefix:
+ *                         type: string
+ *                       scopes:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       isActive:
+ *                         type: boolean
+ *                       expiresAt:
+ *                         type: string
+ *                         format: date-time
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 export const GET = requireAuth(async (_request, user, _context) => {
   try {
     const apiKeys = await apiKeyRepository.findByUserId(user.userId);
@@ -30,6 +78,64 @@ export const GET = requireAuth(async (_request, user, _context) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/api-keys:
+ *   post:
+ *     summary: Create API key
+ *     description: Generate a new API key. The raw key is only returned once.
+ *     tags:
+ *       - API Keys
+ *     security:
+ *       - BearerAuth: []
+ *       - ApiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Friendly name for the key
+ *               scopes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               expiresInDays:
+ *                 type: number
+ *                 description: Expiration in days (optional)
+ *     responses:
+ *       201:
+ *         description: API key created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 apiKey:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     name:
+ *                       type: string
+ *                     rawKey:
+ *                       type: string
+ *                       description: The full API key (save this now!)
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 export const POST = requireAuth(async (request, user, _context) => {
   try {
     const body = await request.json();

@@ -8,6 +8,66 @@ import { JWTSessionService } from '@/infrastructure/security/JWTSessionService';
 const authController = new AuthController();
 const sessionService = new JWTSessionService();
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Authenticate user with email and password to receive access tokens.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: admin@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: admin123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 expiresAt:
+ *                   type: string
+ *                   format: date-time
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     email:
+ *                       type: string
+ *                       format: email
+ *                     fullName:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                       enum: [admin, user]
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Internal server error
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();

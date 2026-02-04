@@ -8,6 +8,52 @@ const userController = new UserController();
 
 type Context = { params: Promise<{ id: string }> };
 
+/**
+ * @swagger
+ * /api/admin/users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     description: Retrieve details of a specific user. Requires admin privileges.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - BearerAuth: []
+ *       - ApiKeyAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     email:
+ *                       type: string
+ *                     fullName:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                     isActive:
+ *                       type: boolean
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 export const GET = requireAdmin<Context>(async (_request, _user, context) => {
   try {
     const { id } = await context.params;
@@ -29,6 +75,52 @@ export const GET = requireAdmin<Context>(async (_request, _user, context) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/admin/users/{id}:
+ *   put:
+ *     summary: Update user
+ *     description: Update user details. Requires admin privileges.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - BearerAuth: []
+ *       - ApiKeyAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user]
+ *               isActive:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 export const PUT = requireAdmin<Context>(async (request, _user, context) => {
   try {
     const { id } = await context.params;
@@ -66,6 +158,39 @@ export const PUT = requireAdmin<Context>(async (request, _user, context) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/admin/users/{id}:
+ *   delete:
+ *     summary: Delete user
+ *     description: Permanently delete a user. Requires admin privileges.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - BearerAuth: []
+ *       - ApiKeyAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 export const DELETE = requireAdmin<Context>(async (_request, _user, context) => {
   try {
     const { id } = await context.params;

@@ -7,6 +7,41 @@ import { JWTSessionService } from '@/infrastructure/security/JWTSessionService';
 const authController = new AuthController();
 const sessionService = new JWTSessionService();
 
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     description: Get a new access token using the httpOnly refresh token cookie.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rotate:
+ *                 type: boolean
+ *                 description: Optionally rotate the refresh token
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 expiresAt:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         description: Invalid or expired refresh token
+ *       500:
+ *         description: Internal server error
+ */
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();

@@ -148,6 +148,8 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for more details.
 
 ### Authentication
 
+> **Interactive Documentation**: Access the full interactive API documentation at [http://localhost:3000/docs](http://localhost:3000/docs).
+
 All protected endpoints require a `Bearer` token:
 
 ```bash
